@@ -1,0 +1,1709 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Make a Birthday Wish!</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Pinyon+Script&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #5a2d49;
+        --gold: #c9a24b;
+        --bg1: #f8d7e5;
+        --bg2: #e6daf6;
+        --bg3: #fff1df;
+        --chip: #ffffffb8;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --ink: #fde9f2;
+          --bg1: #4a2748;
+          --bg2: #2f2a58;
+          --bg3: #5a3a4a;
+          --chip: #2b1a3cc0;
+        }
+      }
+      :root[data-theme="dark"] {
+        --ink: #fde9f2;
+        --bg1: #4a2748;
+        --bg2: #2f2a58;
+        --bg3: #5a3a4a;
+        --chip: #2b1a3cc0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        font-family: "Cormorant Garamond", Georgia, serif;
+        color: var(--ink);
+        background: linear-gradient(
+          160deg,
+          var(--bg1),
+          var(--bg2) 50%,
+          var(--bg3)
+        );
+        overflow: hidden;
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 48%,
+          #fff0b8d8,
+          #ffd9a000 72%
+        );
+        opacity: 0;
+        transition: opacity 1.8s ease;
+        pointer-events: none;
+      }
+      body.warm::before {
+        opacity: 1;
+      }
+      .bk {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(7px);
+        opacity: 0.3;
+        pointer-events: none;
+        animation: drift linear infinite;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translate(18px, -30px);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+      body.lite .bk {
+        display: none;
+      }
+      #gl {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+        cursor: grab;
+        display: block;
+      }
+      #gl:active {
+        cursor: grabbing;
+      }
+      #fx {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 5;
+      }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 0;
+        z-index: 6;
+        pointer-events: none;
+      }
+      h1 {
+        font-family: "Pinyon Script", cursive;
+        font-weight: 400;
+        font-size: clamp(2.1rem, 7vw, 3.9rem);
+        margin: 0;
+        line-height: 1.15;
+        text-shadow: 0 2px 14px #fff6;
+      }
+      #instr {
+        margin: 4px auto 0;
+        max-width: 44ch;
+        font-size: clamp(1.05rem, 2.7vw, 1.4rem);
+        font-weight: 700;
+        line-height: 1.3;
+        transition: opacity 0.5s;
+      }
+      #hud {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 6;
+        padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        pointer-events: none;
+      }
+      #hud > * {
+        pointer-events: auto;
+      }
+      #ptext {
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: inline-block;
+      }
+      #ptext.bump {
+        animation: bump 0.5s ease;
+      }
+      @keyframes bump {
+        40% {
+          transform: scale(1.14);
+        }
+      }
+      #bar {
+        width: min(86vw, 340px);
+        height: 10px;
+        border-radius: 9px;
+        background: var(--chip);
+        overflow: hidden;
+        border: 1px solid #c9a24b88;
+      }
+      #fill {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #f3a6c4, #e2b64f);
+        transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      #dots {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+        max-width: min(92vw, 360px);
+      }
+      .dot {
+        all: unset;
+        box-sizing: border-box;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 50% 70%,
+          #fff3a8,
+          #ff9d3c 60%,
+          #e36a2a
+        );
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          background 0.5s,
+          opacity 0.5s;
+        box-shadow: 0 0 8px #ffa94d99;
+      }
+      .dot:hover {
+        transform: scale(1.15);
+      }
+      .dot:active {
+        transform: scale(0.9);
+      }
+      .dot.out {
+        background: #b9a6c4;
+        box-shadow: none;
+        opacity: 0.5;
+        cursor: default;
+      }
+      .dot:focus-visible,
+      .tool:focus-visible,
+      #env:focus-visible,
+      #closeBtn:focus-visible {
+        outline: 3px solid #c9a24b;
+        outline-offset: 3px;
+      }
+      .tools {
+        position: fixed;
+        top: calc(env(safe-area-inset-top, 0px) + 8px);
+        right: 10px;
+        z-index: 7;
+        display: flex;
+        gap: 6px;
+      }
+      .tool {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        background: var(--chip);
+        color: var(--ink);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font:
+          700 0.95rem "Cormorant Garamond",
+          Georgia,
+          serif;
+        border: 1px solid #c9a24b88;
+        transition:
+          transform 0.15s,
+          background 0.2s;
+      }
+      .tool:hover {
+        background: #fff;
+        color: #5a2d49;
+      }
+      .tool:active {
+        transform: scale(0.95);
+      }
+      #aura {
+        position: fixed;
+        left: 50%;
+        top: 34%;
+        width: min(80vw, 420px);
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%) scale(0.4);
+        border-radius: 50%;
+        background: radial-gradient(#fff3b8dd, #ffe08a55 45%, #fff0 70%);
+        opacity: 0;
+        transition:
+          opacity 1.6s,
+          transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        pointer-events: none;
+        z-index: 4;
+      }
+      #aura.on {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      /* envelope */
+      #envWrap {
+        position: fixed;
+        left: 50%;
+        top: 34%;
+        z-index: 8;
+        width: min(62vw, 260px);
+        aspect-ratio: 26/17;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        pointer-events: none;
+        perspective: 900px;
+      }
+      #envWrap.show {
+        pointer-events: auto;
+        animation: emerge 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+      @keyframes emerge {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 40%) scale(0.2) rotate(-28deg);
+        }
+        60% {
+          opacity: 1;
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1) rotate(0);
+        }
+      }
+      #envWrap::before {
+        content: "";
+        position: absolute;
+        inset: -30%;
+        border-radius: 50%;
+        background: radial-gradient(#ffe9a0aa, #ffe9a000 65%);
+        animation: pulse 2.2s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes pulse {
+        50% {
+          transform: scale(1.15);
+          opacity: 0.6;
+        }
+      }
+      #env {
+        all: unset;
+        box-sizing: border-box;
+        position: absolute;
+        inset: 0;
+        cursor: grab;
+        touch-action: none;
+        display: block;
+        transform-style: preserve-3d;
+        animation: bob 3s ease-in-out infinite;
+        filter: drop-shadow(0 12px 14px #5a2d4955);
+      }
+      #env:hover {
+        filter: drop-shadow(0 12px 14px #5a2d4955) brightness(1.05);
+      }
+      #env.opening {
+        animation: none;
+        cursor: default;
+      }
+      @keyframes bob {
+        50% {
+          transform: translateY(-9px) rotate(1deg);
+        }
+      }
+      #env span {
+        display: block;
+        position: absolute;
+      }
+      .eb {
+        inset: 0;
+        background: linear-gradient(#fff3f7, #f8d3e0);
+        border: 2px solid #c9a24b;
+        border-radius: 6px;
+      }
+      .ef {
+        inset: 0;
+        clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+        background: linear-gradient(160deg, #fde6ee, #f1b9cd);
+        border-radius: 6px;
+        z-index: 2;
+      }
+      .fl {
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 54%;
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+        background: linear-gradient(#fff8fb, #f6cddb);
+        transform-origin: top;
+        transition:
+          transform 0.9s cubic-bezier(0.5, 0, 0.2, 1),
+          z-index 0s 0.45s;
+        z-index: 3;
+        border-top: 3px solid #c9a24b;
+      }
+      #env.open .fl {
+        transform: rotateX(180deg);
+        z-index: 1;
+      }
+      .sealw {
+        left: 50%;
+        top: 54%;
+        width: 16%;
+        min-width: 36px;
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #ffeeb0,
+          #d9a93f 60%,
+          #946718
+        );
+        display: grid !important;
+        place-items: center;
+        color: #fff7d6;
+        font-size: 1.3rem;
+        z-index: 5;
+        box-shadow: 0 2px 6px #0004;
+        transition:
+          opacity 0.6s,
+          transform 0.6s,
+          filter 0.6s;
+      }
+      #env.opening .sealw.gone,
+      .sealw.gone {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.9);
+        filter: blur(4px);
+      }
+      .lbl {
+        left: 0;
+        right: 0;
+        bottom: 11%;
+        text-align: center;
+        font:
+          400 clamp(1.3rem, 5vw, 1.8rem) "Pinyon Script",
+          cursive;
+        color: #9b6c1a;
+        z-index: 2;
+      }
+      .fl1,
+      .fl2 {
+        bottom: 6%;
+        color: #c9a24b;
+        font-size: 1.1rem;
+        z-index: 2;
+      }
+      .fl1 {
+        left: 7%;
+      }
+      .fl2 {
+        right: 7%;
+      }
+      /* letter */
+      #dim {
+        position: fixed;
+        inset: 0;
+        background: #2a0f2399;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.8s;
+        z-index: 9;
+      }
+      #dim.on {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #lw {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        padding: 16px;
+        z-index: 10;
+        pointer-events: none;
+      }
+      #letter {
+        pointer-events: auto;
+        width: min(92vw, 520px);
+        max-height: min(86vh, 780px);
+        max-height: min(86dvh, 780px);
+        overflow: auto;
+        color: #5a2d49;
+        text-align: center;
+        padding: 34px 28px 26px;
+        border-radius: 8px;
+        border: 2px solid #c9a24b;
+        background:
+          radial-gradient(#e6d3b222 1px, #0000 1px) 0 0/6px 6px,
+          linear-gradient(#fffaf0, #fff0db);
+        box-shadow:
+          inset 0 0 0 8px #fffaf0,
+          inset 0 0 0 9px #c9a24b99,
+          0 20px 60px #0007;
+        outline: none;
+      }
+      #letter h2 {
+        font:
+          400 clamp(2rem, 8vw, 2.7rem) "Pinyon Script",
+          cursive;
+        margin: 0 0 6px;
+        color: #a2456f;
+      }
+      .deco {
+        color: #c9a24b;
+        letter-spacing: 0.4em;
+        font-size: 1rem;
+        margin: 4px 0 12px;
+      }
+      #letter p {
+        font-size: clamp(1.08rem, 2.6vw, 1.25rem);
+        line-height: 1.65;
+        margin: 0 0 12px;
+        font-weight: 500;
+      }
+      .sig {
+        font:
+          400 1.9rem "Pinyon Script",
+          cursive;
+        color: #a2456f;
+        margin: 14px 0;
+      }
+      .ln {
+        opacity: 0;
+        transform: translateY(10px);
+        filter: blur(2px);
+        transition:
+          opacity 0.9s,
+          transform 0.9s,
+          filter 0.9s;
+      }
+      #letter.in .ln {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        transition-delay: calc(var(--i) * 0.5s);
+      }
+      #closeBtn {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        padding: 9px 26px;
+        border-radius: 24px;
+        background: linear-gradient(#e9c872, #c9a24b);
+        color: #4a2438;
+        font:
+          700 1.1rem "Cormorant Garamond",
+          Georgia,
+          serif;
+        box-shadow: 0 3px 10px #c9a24b66;
+        transition:
+          transform 0.15s,
+          filter 0.2s;
+      }
+      #closeBtn:hover {
+        filter: brightness(1.08);
+      }
+      #closeBtn:active {
+        transform: scale(0.95);
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button {
+        touch-action: manipulation;
+      }
+      @media (max-width: 560px) {
+        header {
+          padding-top: calc(env(safe-area-inset-top, 0px) + 46px);
+        }
+        .tools {
+          left: 0;
+          right: 0;
+          justify-content: center;
+          top: calc(env(safe-area-inset-top, 0px) + 8px);
+        }
+        .tool {
+          padding: 5px 11px;
+          font-size: 0.88rem;
+        }
+        #instr {
+          font-size: 1.02rem;
+          padding: 0 4px;
+        }
+        .dot {
+          width: 30px;
+          height: 30px;
+        }
+        #dots {
+          max-width: 320px;
+          gap: 5px;
+        }
+        #hud {
+          gap: 6px;
+        }
+        #envWrap {
+          width: min(72vw, 260px);
+          top: 38%;
+        }
+        #letter {
+          padding: 28px 20px 22px;
+        }
+      }
+      @media (max-height: 520px) and (orientation: landscape) {
+        header {
+          padding-top: 6px;
+        }
+        h1 {
+          font-size: 1.9rem;
+        }
+        #instr {
+          font-size: 0.95rem;
+        }
+        .tools {
+          top: 4px;
+        }
+        #dots {
+          display: none;
+        }
+        #envWrap {
+          top: 42%;
+          width: 190px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          transition-delay: 0s !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="gl"
+      aria-label="3D birthday cake with 18 candles. Drag to rotate."
+    ></canvas>
+    <div id="aura"></div>
+    <canvas id="fx"></canvas>
+    <header>
+      <h1>Make a Birthday Wish Aive! 🎂</h1>
+      <p id="instr">
+        Click the fire on every candle to put out the fire then a special
+        message will appear.
+      </p>
+    </header>
+    <div class="tools">
+      <button class="tool" id="sndBtn" aria-pressed="true">🔊 Sound on</button
+      ><button class="tool" id="liteBtn" aria-pressed="false">
+        Simple mode: off
+      </button>
+    </div>
+    <div id="hud">
+      <span id="ptext" aria-live="polite">0 / 18 candles extinguished</span>
+      <div
+        id="bar"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="18"
+        aria-valuenow="0"
+      >
+        <div id="fill"></div>
+      </div>
+      <div
+        id="dots"
+        role="group"
+        aria-label="Candles (keyboard-friendly)"
+      ></div>
+    </div>
+    <div id="envWrap">
+      <button
+        id="env"
+        aria-label="Open your birthday message"
+        aria-expanded="false"
+      >
+        <span class="eb"></span><span class="ef"></span><span class="fl"></span
+        ><span class="lbl">For You</span><span class="fl1">✿</span
+        ><span class="fl2">❀</span><span class="sealw" id="seal">♥</span>
+      </button>
+    </div>
+    <div id="dim"></div>
+    <div id="lw">
+      <div
+        id="letter"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Birthday message"
+        tabindex="-1"
+      ></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      /* ===== EDIT THE MESSAGE HERE (animations and layout stay the same) ===== */
+      const LETTER = {
+        heading: "Happy 18th Birthday Aive! 🎂",
+        paragraphs: [
+          "Today is a special day because it celebrates another beautiful year of your life and the beginning of an exciting new chapter.",
+          "May your 18th birthday bring you endless happiness, genuine love, unforgettable memories, and the courage to follow your dreams. I hope you always remember how special you are and how much joy you bring to the people around you.",
+          "As you begin this new chapter, may life give you countless reasons to smile, beautiful opportunities to grow, and people who will always support and appreciate you.",
+          "Just to let you know na if you need something that i can do for you, i will be there for you. I will always be your friend and support you in every way possible.",
+          "You know when i started to like you from the moment we met not just because of the teasing but from the moment i saw you and saw your spirit glow brightly, i knew that you are someone special and i will always be there for you.",
+          "I do appriate your answer, i really do and i respect that. But Time is still long lets do what we do best HEHE. ",
+          "i Hope na dili ka mo likay nako because of your answer and I really ok with it man, Lets do what be used to do and have fun together. I will always be your friend and support you in every way possible.",
+          "I also hope that you like the gift that i bought for you and i hope that you will like it",
+          "dont mind this system na akong gibuhat kay gusto lang nako nga mahatagan tika ug special message sa imong birthday. I hope nga malipay ka sa akong gibuhat.",
+          "Happy Birthday Aive! I hope you have a wonderful day filled with love, laughter, and all the things that make you happy. May this year bring you new adventures, exciting opportunities, and endless joy.",
+          "You deserve all the beautiful things this world has to offer. Keep smiling, keep dreaming, and never forget how amazing you are.",
+          "Happy 18th Birthday Aive! May your wishes come true, today and always. 🎂✨❤️",
+        ],
+        signature: "With love, always K-Lian ❤️",
+      };
+      /* ======================================================================== */
+      const $ = (s) => document.querySelector(s);
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const D = reduce ? 0.15 : 1,
+        wait = (ms) => new Promise((r) => setTimeout(r, ms * D));
+      let lite = reduce || (navigator.hardwareConcurrency || 8) <= 2,
+        done = 0,
+        busy = false,
+        celeb = -1,
+        sparkUntil = 0,
+        heartUntil = 0;
+      const N = 18;
+
+      /* letter content */
+      (() => {
+        let i = 0;
+        const L = (t) => `style="--i:${i++}"`;
+        $("#letter").innerHTML =
+          `<h2 class="ln" ${L()}>${LETTER.heading}</h2><div class="deco ln" ${L()}>✿ ✦ ❀ ♥ ❀ ✦ ✿</div>` +
+          LETTER.paragraphs
+            .map((p) => `<p class="ln" ${L()}>${p}</p>`)
+            .join("") +
+          `<div class="sig ln" ${L()}>${LETTER.signature}</div><div class="deco ln" ${L()}>✦ ♥ ✦</div><button id="closeBtn" class="ln" ${L()}>Close Message</button>`;
+      })();
+
+      /* bokeh */
+      for (let i = 0; i < 14; i++) {
+        const s = document.createElement("i");
+        s.className = "bk";
+        const z = 30 + Math.random() * 80;
+        s.style.cssText = `width:${z}px;height:${z}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;background:${["#fff", "#ffd6e8", "#e3d3ff", "#ffe9b0"][i % 4]};animation-duration:${9 + Math.random() * 10}s;animation-delay:-${Math.random() * 9}s`;
+        document.body.prepend(s);
+      }
+
+      /* ===== audio (all synthesized, starts after first interaction) ===== */
+      let ac,
+        master,
+        sndOn = true,
+        step = 0;
+      function A() {
+        if (!ac) {
+          const C = window.AudioContext || window.webkitAudioContext;
+          if (!C) return;
+          ac = new C();
+          master = ac.createGain();
+          master.gain.value = sndOn ? 0.8 : 0;
+          master.connect(ac.destination);
+          setInterval(music, 480);
+        }
+        if (ac.state === "suspended") ac.resume();
+      }
+      function tone(f, t = 0, d = 0.4, type = "sine", v = 0.08) {
+        if (!ac || !sndOn) return;
+        const o = ac.createOscillator(),
+          g = ac.createGain(),
+          s = ac.currentTime + t;
+        o.type = type;
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0, s);
+        g.gain.linearRampToValueAtTime(v, s + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, s + d);
+        o.connect(g);
+        g.connect(master);
+        o.start(s);
+        o.stop(s + d + 0.05);
+      }
+      function noise(d, v, type, f, t = 0) {
+        if (!ac || !sndOn) return;
+        const n = (ac.sampleRate * d) | 0,
+          b = ac.createBuffer(1, n, ac.sampleRate),
+          x = b.getChannelData(0);
+        for (let i = 0; i < n; i++)
+          x[i] = (Math.random() * 2 - 1) * (1 - i / n);
+        const s = ac.createBufferSource(),
+          fl = ac.createBiquadFilter(),
+          g = ac.createGain();
+        s.buffer = b;
+        fl.type = type;
+        fl.frequency.value = f;
+        g.gain.value = v;
+        s.connect(fl);
+        fl.connect(g);
+        g.connect(master);
+        s.start(ac.currentTime + t);
+      }
+      const sfx = {
+        puff: () => noise(0.35, 0.25, "bandpass", 900),
+        chime: () =>
+          [1047, 1319, 1568, 2093].forEach((f, i) =>
+            tone(f, i * 0.12, 1.3, "sine", 0.07),
+          ),
+        paper: () => {
+          noise(0.25, 0.2, "highpass", 2500);
+          noise(0.3, 0.15, "highpass", 3500, 0.3);
+        },
+        sparkle: () =>
+          [2093, 2637, 3136, 2349].forEach((f, i) =>
+            tone(f, i * 0.08, 0.5, "triangle", 0.04),
+          ),
+      };
+      const MEL = [
+        523, 659, 784, 659, 587, 698, 880, 698, 523, 659, 784, 1047, 988, 784,
+        659, 523,
+      ];
+      function music() {
+        if (!ac || !sndOn || ac.state !== "running") return;
+        const f = MEL[step % 16];
+        tone(f / 2, 0, 0.9, "triangle", 0.035);
+        if (step % 4 === 0) tone(f / 4, 0, 1.8, "sine", 0.04);
+        if (Math.random() < (0.5 * (N - done)) / N)
+          noise(0.05, 0.05, "highpass", 3000);
+        step++;
+      }
+      $("#sndBtn").onclick = (e) => {
+        A();
+        sndOn = !sndOn;
+        if (master)
+          master.gain.setTargetAtTime(sndOn ? 0.8 : 0, ac.currentTime, 0.05);
+        e.target.textContent = sndOn ? "🔊 Sound on" : "🔇 Sound off";
+        e.target.setAttribute("aria-pressed", sndOn);
+      };
+      addEventListener("pointerdown", A, { once: false, passive: true });
+      addEventListener("keydown", A, { passive: true });
+
+      /* ===== 3D scene ===== */
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({
+          canvas: $("#gl"),
+          antialias: true,
+          alpha: true,
+        });
+      } catch (e) {
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          '<p style="position:fixed;top:40%;left:10%;right:10%;text-align:center;z-index:9">Your device cannot show 3D graphics. Try another browser.</p>',
+        );
+      }
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      const scene = new THREE.Scene(),
+        camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100),
+        target = new THREE.Vector3(0, 1.5, 0);
+      scene.add(new THREE.HemisphereLight(0xfff2f6, 0xd6c2ee, 0.95));
+      const key = new THREE.DirectionalLight(0xfff0dc, 0.85);
+      key.position.set(4, 8, 5);
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      Object.assign(key.shadow.camera, {
+        left: -4,
+        right: 4,
+        top: 5,
+        bottom: -3,
+        near: 1,
+        far: 20,
+      });
+      key.shadow.bias = -0.0005;
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xdcd0ff, 0.35);
+      fill.position.set(-5, 3, -4);
+      scene.add(fill);
+      const cLight = new THREE.PointLight(0xffa24a, 1.6, 8, 1.4);
+      cLight.position.set(0, 2.6, 0);
+      scene.add(cLight);
+
+      const cake = new THREE.Group();
+      scene.add(cake);
+      const std = (c, r = 0.55, m = 0) =>
+        new THREE.MeshStandardMaterial({
+          color: c,
+          roughness: r,
+          metalness: m,
+        });
+      const gold = std(0xd9ae4f, 0.3, 0.85),
+        cream = std(0xfff6e8, 0.5),
+        pink = std(0xa57bdb, 0.55),
+        lav = std(0x8057c8, 0.55),
+        lilac = std(0xc7acf0, 0.55),
+        pearl = std(0xfffdf6, 0.25, 0.1);
+      const mats = {
+        pk: std(0xff9ebd),
+        lv: std(0xb9a3ff),
+        cr: std(0xffffff, 0.5),
+        yl: std(0xffd27a),
+      };
+      function ring(n, rad, y, sr, mat, sy = 1) {
+        const im = new THREE.InstancedMesh(
+            new THREE.SphereGeometry(sr, 12, 10),
+            mat,
+            n,
+          ),
+          m = new THREE.Matrix4();
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * 6.2832;
+          m.compose(
+            new THREE.Vector3(Math.cos(a) * rad, y, Math.sin(a) * rad),
+            new THREE.Quaternion(),
+            new THREE.Vector3(1, sy, 1),
+          );
+          im.setMatrixAt(i, m);
+        }
+        im.castShadow = true;
+        cake.add(im);
+      }
+      function flower(a, r, y, mat) {
+        const g = new THREE.Group();
+        for (let k = 0; k < 5; k++) {
+          const p = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), mat),
+            b = (k / 5) * 6.2832;
+          p.position.set(Math.cos(b) * 0.12, Math.sin(b) * 0.12, 0);
+          p.scale.set(1, 1, 0.45);
+          g.add(p);
+        }
+        const c = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), gold);
+        c.scale.z = 0.6;
+        g.add(c);
+        g.position.set(Math.cos(a) * r, y, Math.sin(a) * r);
+        g.rotation.y = Math.PI / 2 - a;
+        cake.add(g);
+      }
+      function sprinkles(r0, r1, y, n) {
+        const im = new THREE.InstancedMesh(
+            new THREE.CylinderGeometry(0.014, 0.014, 0.09, 5),
+            std(0xffffff, 0.6),
+            n,
+          ),
+          m = new THREE.Matrix4(),
+          q = new THREE.Quaternion(),
+          cols = [0xff7aa8, 0xffd25e, 0x9a86ff, 0x7fe0cc, 0xffffff];
+        for (let i = 0; i < n; i++) {
+          const a = Math.random() * 6.28,
+            r = r0 + Math.random() * (r1 - r0);
+          q.setFromEuler(
+            new THREE.Euler(
+              Math.random() * 3,
+              Math.random() * 3,
+              Math.random() * 3,
+            ),
+          );
+          m.compose(
+            new THREE.Vector3(Math.cos(a) * r, y + 0.05, Math.sin(a) * r),
+            q,
+            new THREE.Vector3(1, 1, 1),
+          );
+          im.setMatrixAt(i, m);
+          im.setColorAt(i, new THREE.Color(cols[i % 5]));
+        }
+        cake.add(im);
+      }
+      [
+        { r: 2.3, h: 0.95, y: 0, m: pink, d: cream },
+        { r: 1.7, h: 0.85, y: 0.95, m: lilac, d: pink },
+        { r: 1.15, h: 0.75, y: 1.8, m: lav, d: cream },
+      ].forEach((L) => {
+        const b = new THREE.Mesh(
+          new THREE.CylinderGeometry(L.r, L.r, L.h, 72),
+          L.m,
+        );
+        b.position.y = L.y + L.h / 2;
+        b.castShadow = b.receiveShadow = true;
+        cake.add(b);
+        const cap = new THREE.Mesh(
+          new THREE.CylinderGeometry(L.r * 1.01, L.r * 1.01, 0.08, 72),
+          cream,
+        );
+        cap.position.y = L.y + L.h;
+        cap.receiveShadow = true;
+        cake.add(cap);
+        const t = new THREE.Mesh(
+          new THREE.TorusGeometry(L.r * 1.01, 0.035, 8, 80),
+          gold,
+        );
+        t.rotation.x = Math.PI / 2;
+        t.position.y = L.y + 0.05;
+        cake.add(t);
+        ring(Math.round(L.r * 20), L.r + 0.03, L.y + 0.16, 0.06, pearl);
+        ring(Math.round(L.r * 14), L.r + 0.01, L.y + L.h - 0.2, 0.1, L.d, 2.4);
+      });
+      const rb = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.715, 1.715, 0.12, 72),
+        pink,
+      );
+      rb.position.y = 1.2;
+      cake.add(rb);
+      [1.14, 1.26].forEach((y) => {
+        const t = new THREE.Mesh(
+          new THREE.TorusGeometry(1.72, 0.02, 6, 80),
+          gold,
+        );
+        t.rotation.x = Math.PI / 2;
+        t.position.y = y;
+        cake.add(t);
+      });
+      for (let i = 0; i < 8; i++)
+        flower((i / 8) * 6.28 + 0.2, 1.74, 1.55, i % 2 ? mats.pk : mats.lv);
+      for (let i = 0; i < 10; i++)
+        flower((i / 10) * 6.28, 2.34, 0.5, i % 2 ? mats.lv : mats.yl);
+      for (let i = 0; i < 7; i++)
+        flower((i / 7) * 6.28 + 0.3, 1.18, 2.15, mats.pk);
+      sprinkles(1.78, 2.2, 0.96, 110);
+      sprinkles(1.2, 1.62, 1.82, 70);
+      const plate = new THREE.Mesh(
+        new THREE.CylinderGeometry(2.75, 2.75, 0.12, 72),
+        cream,
+      );
+      plate.position.y = -0.06;
+      plate.receiveShadow = true;
+      cake.add(plate);
+      const pr = new THREE.Mesh(
+        new THREE.TorusGeometry(2.75, 0.04, 8, 90),
+        gold,
+      );
+      pr.rotation.x = Math.PI / 2;
+      pr.position.y = 0;
+      cake.add(pr);
+
+      /* soft ground shadow (floating look) */
+      function radTex(stops, w = 128, h = w) {
+        const c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        const x = c.getContext("2d"),
+          g = x.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+        stops.forEach((s) => g.addColorStop(s[0], s[1]));
+        x.fillStyle = g;
+        x.fillRect(0, 0, w, h);
+        return new THREE.CanvasTexture(c);
+      }
+      const shadow = new THREE.Mesh(
+        new THREE.PlaneGeometry(9, 9),
+        new THREE.MeshBasicMaterial({
+          map: radTex([
+            [0, "rgba(70,30,80,.55)"],
+            [0.55, "rgba(70,30,80,.2)"],
+            [1, "rgba(70,30,80,0)"],
+          ]),
+          transparent: true,
+          depthWrite: false,
+        }),
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = -0.45;
+      scene.add(shadow);
+
+      /* candles */
+      const flameTex = (() => {
+        const c = document.createElement("canvas");
+        c.width = 64;
+        c.height = 128;
+        const x = c.getContext("2d");
+        x.translate(32, 70);
+        x.scale(1, 1.7);
+        const g = x.createRadialGradient(0, 8, 1, 0, 0, 30);
+        g.addColorStop(0, "rgba(255,255,230,1)");
+        g.addColorStop(0.3, "rgba(255,214,90,.95)");
+        g.addColorStop(0.7, "rgba(255,128,30,.6)");
+        g.addColorStop(1, "rgba(255,90,0,0)");
+        x.fillStyle = g;
+        x.beginPath();
+        x.moveTo(0, -34);
+        x.bezierCurveTo(22, -8, 26, 10, 0, 26);
+        x.bezierCurveTo(-26, 10, -22, -8, 0, -34);
+        x.fill();
+        return new THREE.CanvasTexture(c);
+      })();
+      const glowTex = radTex([
+        [0, "rgba(255,190,90,.8)"],
+        [0.4, "rgba(255,150,50,.3)"],
+        [1, "rgba(255,120,30,0)"],
+      ]);
+      const smokeTex = radTex(
+        [
+          [0, "rgba(190,185,195,.7)"],
+          [1, "rgba(190,185,195,0)"],
+        ],
+        64,
+      );
+      const cols = [0xff9ec1, 0xb9a3ff, 0xffd27a, 0x8fe3d0, 0xff8a8a, 0xa5c8ff],
+        H = 0.55,
+        TOP = 2.55;
+      const candles = [],
+        hits = [];
+      for (let i = 0; i < N; i++) {
+        const ti = i < 8 ? 0 : i < 14 ? 1 : 2,
+          T = [
+            [8, 2.0, 0.99, 0],
+            [6, 1.45, 1.84, 0.3],
+            [4, 0.6, 2.55, 0.5],
+          ][ti],
+          k = ti === 0 ? i : ti === 1 ? i - 8 : i - 14,
+          a = (k / T[0]) * 6.2832 + T[3],
+          r = T[1],
+          by = T[2];
+        const g = new THREE.Group();
+        g.position.set(Math.cos(a) * r, by, Math.sin(a) * r);
+        const body = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.055, H, 16),
+          std(cols[i % 6], 0.45),
+        );
+        body.position.y = H / 2;
+        body.castShadow = true;
+        g.add(body);
+        [0.2, 0.5, 0.8].forEach((f) => {
+          const t = new THREE.Mesh(
+            new THREE.TorusGeometry(0.053, 0.009, 6, 16),
+            pearl,
+          );
+          t.rotation.x = Math.PI / 2;
+          t.position.y = H * f;
+          g.add(t);
+        });
+        const wick = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.009, 0.009, 0.1, 6),
+          new THREE.MeshBasicMaterial({ color: 0x2a1a14 }),
+        );
+        wick.position.y = H + 0.04;
+        g.add(wick);
+        const flame = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: flameTex,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+          }),
+        );
+        const glow = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: glowTex,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+            opacity: 0.55,
+          }),
+        );
+        glow.scale.set(0.95, 0.95, 1);
+        glow.position.y = H + 0.2;
+        g.add(flame, glow);
+        const hit = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2, 10, 8),
+          new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0,
+            depthWrite: false,
+          }),
+        );
+        hit.position.y = H + 0.2;
+        hit.userData.i = i;
+        g.add(hit);
+        cake.add(g);
+        candles.push({
+          g,
+          flame,
+          glow,
+          wick,
+          hit,
+          lit: true,
+          dying: -1,
+          x: g.position.x,
+          y: by,
+          z: g.position.z,
+        });
+        hits.push(hit);
+      }
+      /* embers */
+      const EN = N * 3,
+        ePos = new Float32Array(EN * 3),
+        eCol = new Float32Array(EN * 3),
+        eG = new THREE.BufferGeometry();
+      eG.setAttribute("position", new THREE.BufferAttribute(ePos, 3));
+      eG.setAttribute("color", new THREE.BufferAttribute(eCol, 3));
+      cake.add(
+        new THREE.Points(
+          eG,
+          new THREE.PointsMaterial({
+            size: 0.045,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthWrite: false,
+          }),
+        ),
+      );
+      const smoke = [];
+      function puff(c) {
+        for (let k = 0; k < 6; k++) {
+          const s = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: smokeTex,
+              transparent: true,
+              depthWrite: false,
+              opacity: 0.6,
+            }),
+          );
+          s.position.set(
+            c.x + (Math.random() - 0.5) * 0.06,
+            c.y + H + 0.12,
+            c.z + (Math.random() - 0.5) * 0.06,
+          );
+          s.userData = {
+            l: 0,
+            m: 1.3 + Math.random() * 0.6,
+            vx: (Math.random() - 0.5) * 0.12,
+            vz: (Math.random() - 0.5) * 0.12,
+            d: k * 0.04,
+          };
+          s.scale.setScalar(0.08);
+          cake.add(s);
+          smoke.push(s);
+        }
+      }
+
+      /* ===== progress / extinguish ===== */
+      const dots = $("#dots");
+      for (let i = 0; i < N; i++) {
+        const b = document.createElement("button");
+        b.className = "dot";
+        b.setAttribute("aria-label", "Put out candle " + (i + 1));
+        b.onclick = () => out(i);
+        dots.append(b);
+      }
+      function out(i) {
+        const c = candles[i];
+        if (!c.lit) return false;
+        c.lit = false;
+        c.dying = 0;
+        puff(c);
+        sfx.puff();
+        done++;
+        dots.children[i].classList.add("out");
+        dots.children[i].setAttribute(
+          "aria-label",
+          "Candle " + (i + 1) + " is out",
+        );
+        dots.children[i].tabIndex = -1;
+        const pt = $("#ptext");
+        pt.textContent = done + " / " + N + " candles extinguished";
+        pt.classList.remove("bump");
+        void pt.offsetWidth;
+        pt.classList.add("bump");
+        $("#fill").style.width = (done / N) * 100 + "%";
+        $("#bar").setAttribute("aria-valuenow", done);
+        if (done === N) celebrate();
+        return true;
+      }
+
+      /* ===== interaction: drag to rotate, tap flame to extinguish ===== */
+      const cv = $("#gl"),
+        ray = new THREE.Raycaster(),
+        ndc = new THREE.Vector2();
+      let drag = false,
+        moved = 0,
+        sx = 0,
+        lx = 0,
+        spin = 0;
+      const AUTO = 0.3;
+      function pick(e) {
+        ndc.set(
+          (e.clientX / innerWidth) * 2 - 1,
+          -(e.clientY / innerHeight) * 2 + 1,
+        );
+        ray.setFromCamera(ndc, camera);
+        const h = ray.intersectObjects(
+          candles.filter((c) => c.lit).map((c) => c.hit),
+        );
+        return h.length ? h[0].object.userData.i : -1;
+      }
+      cv.addEventListener("pointerdown", (e) => {
+        drag = true;
+        moved = 0;
+        sx = lx = e.clientX;
+        cv.setPointerCapture(e.pointerId);
+      });
+      cv.addEventListener("pointermove", (e) => {
+        if (drag) {
+          const dx = e.clientX - lx;
+          lx = e.clientX;
+          moved += Math.abs(dx);
+          cake.rotation.y += dx * 0.009;
+          spin = dx * 0.009 * 60;
+        } else cv.style.cursor = pick(e) >= 0 ? "pointer" : "grab";
+      });
+      const end = (e) => {
+        if (!drag) return;
+        drag = false;
+        if (moved < 8) {
+          const i = pick(e);
+          if (i >= 0) out(i);
+        }
+      };
+      cv.addEventListener("pointerup", end);
+      cv.addEventListener("pointercancel", () => (drag = false));
+
+      /* ===== 2D effects overlay ===== */
+      const fx = $("#fx"),
+        cx = fx.getContext("2d");
+      let P = [];
+      function fxSize() {
+        const d = Math.min(devicePixelRatio || 1, 2);
+        fx.width = innerWidth * d;
+        fx.height = innerHeight * d;
+        cx.setTransform(d, 0, 0, d, 0, 0);
+      }
+      function spawn(x, y, k, o = {}) {
+        P.push({
+          x,
+          y,
+          vx: o.vx ?? (Math.random() - 0.5) * 40,
+          vy: o.vy ?? -20 - Math.random() * 50,
+          l: 0,
+          m: o.m || 1.5 + Math.random() * 1.5,
+          k,
+          s: o.s || 2 + Math.random() * 3,
+          c: o.c || (Math.random() < 0.5 ? "#ffd76a" : "#fff1b8"),
+        });
+      }
+      function burstAt(el, k, n) {
+        const r = el.getBoundingClientRect(),
+          x = r.left + r.width / 2,
+          y = r.top + r.height / 2;
+        for (let i = 0; i < n * (lite ? 0.4 : 1); i++) {
+          const a = Math.random() * 6.28,
+            v = 40 + Math.random() * 130;
+          spawn(x, y, k, {
+            vx: Math.cos(a) * v,
+            vy: Math.sin(a) * v,
+            m: 0.8 + Math.random(),
+          });
+        }
+      }
+      function cakeXY() {
+        const v = new THREE.Vector3(0, 1.6, 0).project(camera);
+        return [((v.x + 1) / 2) * innerWidth, ((1 - v.y) / 2) * innerHeight];
+      }
+      function drawFx(dt, now) {
+        cx.clearRect(0, 0, innerWidth, innerHeight);
+        const q = lite ? 0.35 : 1;
+        if (Math.random() < dt * 4 * q)
+          spawn(
+            Math.random() * innerWidth,
+            Math.random() * innerHeight,
+            "spark",
+            {
+              vx: 0,
+              vy: -5,
+              s: 1.5 + Math.random() * 1.5,
+              m: 2 + Math.random() * 2,
+              c: "#fff3c4",
+            },
+          );
+        if (now < sparkUntil) {
+          const [x, y] = cakeXY(),
+            s = Math.min(innerWidth, innerHeight);
+          for (let i = 0; i < 3 * q; i++) {
+            const a = Math.random() * 6.28,
+              r = s * (0.2 + Math.random() * 0.3);
+            spawn(
+              x + Math.cos(a) * r,
+              y + Math.sin(a) * r * 0.7,
+              Math.random() < 0.6 ? "spark" : "mote",
+              { vy: -30 - Math.random() * 70, s: 2 + Math.random() * 3 },
+            );
+          }
+        }
+        if (now < heartUntil && Math.random() < dt * 6 * q)
+          spawn(Math.random() * innerWidth, innerHeight + 10, "heart", {
+            vx: (Math.random() - 0.5) * 30,
+            vy: -50 - Math.random() * 50,
+            m: 4 + Math.random() * 2,
+            c: Math.random() < 0.5 ? "#ff8fb5" : "#ffb3cf",
+            s: 2 + Math.random() * 2,
+          });
+        P = P.filter((p) => (p.l += dt) < p.m);
+        for (const p of P) {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= 0.99;
+          const a = Math.sin((Math.PI * p.l) / p.m);
+          cx.globalAlpha = a * (p.k === "heart" ? 0.85 : 1);
+          cx.fillStyle = p.c;
+          if (p.k === "heart") {
+            cx.font = p.s * 6 + "px serif";
+            cx.fillText("♥", p.x, p.y);
+          } else {
+            cx.beginPath();
+            cx.arc(p.x, p.y, p.s * (0.4 + 0.6 * a), 0, 6.3);
+            cx.fill();
+            if (p.k === "spark") {
+              cx.fillRect(p.x - p.s * 2, p.y - 0.5, p.s * 4, 1);
+              cx.fillRect(p.x - 0.5, p.y - p.s * 2, 1, p.s * 4);
+            }
+          }
+        }
+        cx.globalAlpha = 1;
+      }
+
+      /* ===== render loop ===== */
+      let lightI = 1,
+        last = performance.now();
+      function frame(now) {
+        requestAnimationFrame(frame);
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        const t = now / 1000;
+        if (!drag) {
+          spin += ((reduce ? 0 : AUTO) - spin) * Math.min(1, dt * 1.5);
+          cake.rotation.y += spin * dt;
+        }
+        let ep = 0,
+          lit = 0;
+        candles.forEach((c, i) => {
+          if (c.lit) {
+            lit++;
+            const f =
+                1 +
+                0.1 * Math.sin(t * 13 + i * 1.7) +
+                0.06 * Math.sin(t * 23 + i * 3.1),
+              h = 0.34 * f;
+            c.flame.scale.set(0.18 * (1 - 0.08 * Math.sin(t * 17 + i)), h, 1);
+            c.flame.position.set(
+              Math.sin(t * 9 + i) * 0.012,
+              H + 0.1 + h / 2 - 0.02,
+              0,
+            );
+            c.glow.material.opacity = 0.5 + 0.12 * Math.sin(t * 11 + i * 2);
+          } else if (c.dying >= 0) {
+            c.dying += dt;
+            const p = Math.min(1, c.dying / 0.75),
+              k = 1 - p,
+              fl = 0.55 + 0.45 * Math.abs(Math.sin(t * 55));
+            c.flame.scale.set(0.18 * k, 0.34 * k * fl, 1);
+            c.flame.material.opacity = k * fl;
+            c.glow.material.opacity = 0.5 * k * k;
+            if (p >= 1) {
+              c.flame.visible = c.glow.visible = false;
+              c.dying = -1;
+              c.wick.material.color.setHex(0x120c0a);
+            } else c.wick.material.color.setHex(0xff7a2a);
+          }
+          for (let k = 0; k < 3; k++) {
+            const j = (i * 3 + k) * 3,
+              ph = (t * 0.35 + k / 3 + i * 0.137) % 1;
+            ePos[j] = c.x + Math.sin(t * 3 + i * 5 + k * 2) * 0.05 * ph;
+            ePos[j + 1] = c.y + H + 0.15 + ph * 0.5;
+            ePos[j + 2] = c.z + Math.cos(t * 2.5 + i * 3 + k) * 0.05 * ph;
+            const v = c.lit ? (1 - ph) * 0.9 : 0;
+            eCol[j] = v;
+            eCol[j + 1] = v * 0.65;
+            eCol[j + 2] = v * 0.2;
+          }
+        });
+        eG.attributes.position.needsUpdate =
+          eG.attributes.color.needsUpdate = true;
+        for (let i = smoke.length - 1; i >= 0; i--) {
+          const s = smoke[i],
+            u = s.userData;
+          u.l += dt;
+          const p = (u.l - u.d) / u.m;
+          if (p < 0) continue;
+          if (p >= 1) {
+            cake.remove(s);
+            s.material.dispose();
+            smoke.splice(i, 1);
+            continue;
+          }
+          s.position.x += u.vx * dt;
+          s.position.z += u.vz * dt;
+          s.position.y += dt * 0.45;
+          s.scale.setScalar(0.1 + p * 0.5);
+          s.material.opacity = 0.6 * (1 - p);
+        }
+        lightI += (lit / N - lightI) * Math.min(1, dt * 4);
+        cLight.intensity = 1.5 * lightI;
+        let hop = 0,
+          sc = 1;
+        if (celeb >= 0) {
+          celeb += dt;
+          const p = Math.min(1, celeb / 1.8);
+          hop = Math.sin(p * Math.PI) * 0.3;
+          sc = 1 + Math.sin(p * Math.PI) * 0.04;
+          if (!drag && p < 1) spin += dt * 5 * (1 - p);
+          if (p >= 1) celeb = -1;
+        }
+        const bob = reduce ? 0 : Math.sin(t * 1.2) * 0.05;
+        cake.position.y = bob + hop;
+        cake.scale.setScalar(sc);
+        shadow.material.opacity = 1 - (bob + hop) * 1.2;
+        shadow.scale.setScalar(1 - (bob + hop) * 0.6);
+        camera.lookAt(target);
+        renderer.render(scene, camera);
+        drawFx(dt, now);
+      }
+
+      function resize() {
+        const w = innerWidth,
+          h = innerHeight,
+          asp = w / h;
+        renderer.setPixelRatio(
+          lite ? 1 : Math.min(devicePixelRatio || 1, asp < 0.9 ? 1.5 : 2),
+        );
+        renderer.setSize(w, h, false);
+        camera.aspect = asp;
+        const d = Math.max(10, 9.6 / asp),
+          port = asp < 0.9;
+        target.y = port ? 1.0 : 1.5;
+        candles.forEach((c) => c.hit.scale.setScalar(port ? 1.8 : 1));
+        camera.position.set(0, target.y + d * 0.42, d * 0.9);
+        camera.updateProjectionMatrix();
+        fxSize();
+      }
+      addEventListener("resize", resize);
+      resize();
+      requestAnimationFrame(frame);
+
+      $("#liteBtn").onclick = (e) => {
+        lite = !lite;
+        document.body.classList.toggle("lite", lite);
+        key.castShadow = !lite;
+        renderer.shadowMap.enabled = !lite;
+        scene.traverse((o) => {
+          if (o.material) o.material.needsUpdate = true;
+        });
+        e.target.textContent = "Simple mode: " + (lite ? "on" : "off");
+        e.target.setAttribute("aria-pressed", lite);
+        resize();
+      };
+      if (lite) {
+        document.body.classList.add("lite");
+        key.castShadow = false;
+        renderer.shadowMap.enabled = false;
+        $("#liteBtn").textContent = "Simple mode: on";
+        $("#liteBtn").setAttribute("aria-pressed", "true");
+      }
+
+      /* ===== celebration + envelope ===== */
+      const envWrap = $("#envWrap"),
+        env = $("#env"),
+        seal = $("#seal"),
+        dim = $("#dim"),
+        lw = $("#lw"),
+        letter = $("#letter");
+      async function celebrate() {
+        document.body.classList.add("warm");
+        sparkUntil = performance.now() + 7000;
+        celeb = 0;
+        await wait(900);
+        $("#aura").classList.add("on");
+        await wait(1200);
+        envWrap.classList.add("show");
+        sfx.chime();
+        $("#instr").textContent =
+          "You did it! A special birthday message is waiting for you. 💌";
+        await wait(1500);
+        burstAt(envWrap, "spark", 30);
+        env.focus({ preventScroll: true });
+      }
+      function envDelta() {
+        const r = envWrap.getBoundingClientRect(),
+          l = letter.getBoundingClientRect();
+        return {
+          dx: r.left + r.width / 2 - (l.left + l.width / 2),
+          dy: r.top + r.height / 2 - (l.top + l.height / 2),
+          s: Math.min(r.width / l.width, 0.45),
+        };
+      }
+      async function openEnv() {
+        if (
+          busy ||
+          !envWrap.classList.contains("show") ||
+          env.classList.contains("open")
+        )
+          return;
+        busy = true;
+        env.classList.add("opening");
+        env.setAttribute("aria-expanded", "true");
+        sfx.paper();
+        seal.classList.add("gone");
+        burstAt(seal, "spark", 34);
+        await wait(700);
+        env.classList.add("open");
+        await wait(950);
+        letter.classList.remove("in");
+        letter.style.opacity = 0;
+        lw.style.display = "grid";
+        letter.scrollTop = 0;
+        dim.classList.add("on");
+        const { dx, dy, s } = envDelta();
+        letter.style.opacity = "";
+        await letter.animate(
+          [
+            { transform: `translate(${dx}px,${dy}px) scale(${s})`, opacity: 0 },
+            {
+              transform: `translate(${dx}px,${dy * 0.55}px) scale(${s * 1.2})`,
+              opacity: 1,
+              offset: 0.25,
+            },
+            { transform: "none", opacity: 1 },
+          ],
+          {
+            duration: 1100 * D,
+            easing: "cubic-bezier(.2,.8,.2,1)",
+            fill: "both",
+          },
+        ).finished;
+        sfx.sparkle();
+        letter.classList.add("in");
+        heartUntil = performance.now() + 9000;
+        letter.focus({ preventScroll: true });
+        busy = false;
+      }
+      async function closeEnv() {
+        if (busy || !env.classList.contains("open")) return;
+        busy = true;
+        heartUntil = 0;
+        letter.classList.remove("in");
+        await wait(550);
+        dim.classList.remove("on");
+        const { dx, dy, s } = envDelta();
+        await letter.animate(
+          [
+            { transform: "none", opacity: 1 },
+            { transform: `translate(${dx}px,${dy}px) scale(${s})`, opacity: 0 },
+          ],
+          {
+            duration: 900 * D,
+            easing: "cubic-bezier(.6,0,.4,1)",
+            fill: "both",
+          },
+        ).finished;
+        lw.style.display = "none";
+        letter.getAnimations().forEach((a) => a.cancel());
+        env.classList.remove("open");
+        env.setAttribute("aria-expanded", "false");
+        await wait(950);
+        seal.classList.remove("gone");
+        burstAt(seal, "spark", 18);
+        sfx.sparkle();
+        env.classList.remove("opening");
+        busy = false;
+        env.focus({ preventScroll: true });
+      }
+      let ed = null,
+        edMoved = 0;
+      env.addEventListener("pointerdown", (e) => {
+        if (busy || env.classList.contains("opening")) return;
+        const r = envWrap.getBoundingClientRect();
+        ed = {
+          ox: e.clientX - (r.left + r.width / 2),
+          oy: e.clientY - (r.top + r.height / 2),
+          sx: e.clientX,
+          sy: e.clientY,
+        };
+        edMoved = 0;
+        env.setPointerCapture(e.pointerId);
+      });
+      env.addEventListener("pointermove", (e) => {
+        if (!ed) return;
+        edMoved = Math.max(
+          edMoved,
+          Math.hypot(e.clientX - ed.sx, e.clientY - ed.sy),
+        );
+        if (edMoved < 6) return;
+        env.style.cursor = "grabbing";
+        const r = envWrap.getBoundingClientRect(),
+          x = Math.min(
+            innerWidth - r.width / 2,
+            Math.max(r.width / 2, e.clientX - ed.ox),
+          ),
+          y = Math.min(
+            innerHeight - r.height / 2,
+            Math.max(r.height / 2, e.clientY - ed.oy),
+          );
+        envWrap.style.left = x + "px";
+        envWrap.style.top = y + "px";
+      });
+      env.addEventListener("pointerup", () => {
+        ed = null;
+        env.style.cursor = "";
+      });
+      env.addEventListener("pointercancel", () => {
+        ed = null;
+        env.style.cursor = "";
+      });
+      env.addEventListener("click", () => {
+        if (edMoved >= 6) {
+          edMoved = 0;
+          return;
+        }
+        openEnv();
+      });
+      letter.addEventListener("click", (e) => {
+        if (e.target.id === "closeBtn") closeEnv();
+      });
+      addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeEnv();
+      });
+    </script>
+  </body>
+</html>
